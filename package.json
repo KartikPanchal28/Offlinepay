@@ -1,0 +1,18 @@
+{
+  "name": "offline-pay",
+  "version": "1.0.0",
+  "description": "Offline-first payment wallet (PWA) with a MySQL-backed Node server",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "better-sqlite3": "^13.0.3",
+    "mysql2": "^3.24.5"
+  }
+}

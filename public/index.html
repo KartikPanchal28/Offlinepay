@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>OfflinePay — Pay Anywhere</title>
+  <meta name="description" content="Pay and get paid, with or without internet. A premium offline-first payment wallet.">
+  <meta name="theme-color" content="#080E1F">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="icon" href="/icons/icon-192.png" type="image/png">
+  <link rel="apple-touch-icon" href="/icons/icon-192.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="OfflinePay">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <div class="app" id="app">
+    <header class="topbar" id="topbar" hidden>
+      <a class="icon-btn" id="back" href="#/home" aria-label="Back" hidden>
+        <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5 8 12l7 7"/></svg>
+      </a>
+      <span class="brand" id="title">OfflinePay</span>
+      <button class="chip" id="status" data-action="sync" type="button" aria-label="Connection status. Tap to sync" hidden>
+        <i class="dot"></i><span id="status-text">Checking</span>
+      </button>
+    </header>
+
+    <div class="banner" id="banner" role="status" hidden>
+      ⚡ You're offline — payments are saved locally and sync automatically when internet returns.
+    </div>
+
+    <main class="view" id="view" tabindex="-1"></main>
+
+    <nav class="tabs" id="tabs" aria-label="Main" hidden>
+      <a class="tab" data-tab="home" href="#/home">
+        <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5h13V10"/><path d="M10 19.5v-5h4v5"/></svg>
+        <span>Home</span>
+      </a>
+      <a class="tab scan" data-tab="scan" href="#/scan">
+        <span class="tab-ic"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8V5.5A1.5 1.5 0 0 1 5.5 4H8"/><path d="M16 4h2.5A1.5 1.5 0 0 1 20 5.5V8"/><path d="M20 16v2.5a1.5 1.5 0 0 1-1.5 1.5H16"/><path d="M8 20H5.5A1.5 1.5 0 0 1 4 18.5V16"/><path d="M8 12h8"/></svg></span>
+        <span>Scan</span>
+      </a>
+      <a class="tab" data-tab="history" href="#/history">
+        <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h14M5 12h14M5 18h9"/></svg>
+        <span>Activity</span>
+      </a>
+      <a class="tab" data-tab="me" href="#/me">
+        <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8.5" r="3.5"/><path d="M5 20c.8-3.6 3.5-5.5 7-5.5s6.2 1.9 7 5.5"/></svg>
+        <span>Me</span>
+      </a>
+    </nav>
+  </div>
+
+  <div id="overlay"></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <noscript><p class="noscript">OfflinePay needs JavaScript to run.</p></noscript>
+
+  <script type="module" src="/js/app.js"></script>
+</body>
+</html>
