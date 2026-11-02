@@ -139,7 +139,9 @@ export function createApp({ dataFile = null, publicDir = PUBLIC_DIR, topupEnable
 
   // Migrate old JSON data if present
   const oldJson = path.join(path.dirname(dbPath), 'db.json');
-  migrateFromJson(sqlDb, oldJson);
+  if (path.resolve(oldJson) !== path.resolve(dbPath)) {
+    migrateFromJson(sqlDb, oldJson);
+  }
 
   /* ---------- prepared statements ---------- */
   const stmt = {

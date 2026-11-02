@@ -96,7 +96,7 @@ export function createWalletClient({ db, apiBase = '', fetchImpl } = {}) {
     return profile;
   }
 
-  async function unlock(pin) {
+  async function unlock(pin, { syncOnUnlock = true } = {}) {
     if (!profile) throw new WalletError('NO_WALLET', 'No wallet on this device');
     const guard = (await db.kv.get('guard')) || { fails: 0, until: 0 };
     if (guard.until > Date.now()) {
@@ -116,7 +116,7 @@ export function createWalletClient({ db, apiBase = '', fetchImpl } = {}) {
     emit();
     // Register/update this account as soon as it is unlocked. This is best-effort so
     // wallet creation and offline use still work when the server cannot be reached.
-    void sync();
+    if (syncOnUnlock) void sync();
     return true;
   }
 
@@ -176,7 +176,7 @@ export function createWalletClient({ db, apiBase = '', fetchImpl } = {}) {
       if (amount > CONFIG.maxPaymentMinor) throw new WalletError('LIMIT', `The limit per payment is ${fmtMoney(CONFIG.maxPaymentMinor)}.`);
       const s = await summary();
       if (amount > s.available) throw new WalletError('NO_FUNDS', `Not enough balance. You can spend ${fmtMoney(s.available)}.`);
-      await unlock(pin); // PIN check = the key can only be decrypted with the right PIN
+      await unlock(pin, { syncOnUnlock: false }); // PIN check = the key can only be decrypted with the right PIN
       const order = await P.signOrder(key, {
         from: profile.id, fromName: profile.name, pub: profile.pub,
         to, amount, currency: CONFIG.currency, note: cleanNote(note),
@@ -271,10 +271,21 @@ export function createWalletClient({ db, apiBase = '', fetchImpl } = {}) {
     }
   }
 
+  let nextSync = null;
+
   /** Deliver pending orders, then fetch balance and history. Never throws. */
   function sync(opts) {
     if (!profile) return Promise.resolve({ ok: false, error: 'No wallet' });
-    if (!syncing) syncing = doSync(opts || {}).finally(() => { syncing = null; });
+    if (syncing) {
+      if (!nextSync) {
+        nextSync = syncing.then(() => {
+          nextSync = null;
+          return sync(opts);
+        });
+      }
+      return nextSync;
+    }
+    syncing = doSync(opts || {}).finally(() => { syncing = null; });
     return syncing;
   }
 
