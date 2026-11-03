@@ -302,7 +302,19 @@ export async function createMySqlApp({ publicDir = PUBLIC_DIR, topupEnabled = tr
 export async function startMySqlServer() {
   const tls = process.env.TLS_KEY && process.env.TLS_CERT ? { key: fs.readFileSync(process.env.TLS_KEY), cert: fs.readFileSync(process.env.TLS_CERT) } : null;
   const app = await createMySqlApp({ topupEnabled: process.env.DEMO_TOPUP !== '0', tls });
-  const port = await app.listen();
+  const requestedPort = Number(process.env.PORT) || 3000;
+  let port;
+  try {
+    port = await app.listen(requestedPort);
+  } catch (err) {
+    if (err.code === 'EADDRINUSE') {
+      console.error(`\n❌ Error: Port ${requestedPort} is already in use by another running process.`);
+      console.error(`👉 Fix: Stop the process using port ${requestedPort}, or start on a different port:`);
+      console.error(`   PORT=3001 npm start\n`);
+      process.exit(1);
+    }
+    throw err;
+  }
   console.log(`\n${CONFIG.appName} is running (${CONFIG.currency}, MySQL database ${app.database})`);
   console.log(`  This computer: http${tls ? 's' : ''}://localhost:${port}`);
   for (const list of Object.values(os.networkInterfaces())) for (const nic of list || []) if (nic.family === 'IPv4' && !nic.internal) console.log(`  Same network:  http${tls ? 's' : ''}://${nic.address}:${port}`);

@@ -482,7 +482,17 @@ if (isMain) {
   const useTls = !!(process.env.TLS_KEY && process.env.TLS_CERT);
   const tls = useTls ? { key: fs.readFileSync(process.env.TLS_KEY), cert: fs.readFileSync(process.env.TLS_CERT) } : null;
   const app = createApp({ dataFile, topupEnabled: process.env.DEMO_TOPUP !== '0', tls });
-  await app.listen(port, process.env.HOST || '0.0.0.0');
+  try {
+    await app.listen(port, process.env.HOST || '0.0.0.0');
+  } catch (err) {
+    if (err.code === 'EADDRINUSE') {
+      console.error(`\n❌ Error: Port ${port} is already in use by another running process.`);
+      console.error(`👉 Fix: Stop the process using port ${port}, or start on a different port:`);
+      console.error(`   PORT=3001 npm start\n`);
+      process.exit(1);
+    }
+    throw err;
+  }
 
   const scheme = useTls ? 'https' : 'http';
   console.log(`\n🔷 ${CONFIG.appName} is running (${CONFIG.currency}, demo money ${process.env.DEMO_TOPUP === '0' ? 'OFF' : 'ON'})`);
